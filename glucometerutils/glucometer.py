@@ -71,6 +71,14 @@ def main():
         default=False,
         help="Enable ketone reading if available on the glucometer.",
     )
+    
+    parser_dump.add_argument(
+            "--text",
+            action="store",
+            default=False,
+            help="outputs readings to a text document",
+     )
+
 
     parser_date = subparsers.add_parser(
         "datetime", help="Reads or sets the date and time of the glucometer."
@@ -136,6 +144,15 @@ def main():
                 unit = device_info.native_unit
 
             readings = device.get_readings()
+            
+            if args.text:
+                filename = input("Please enter a filename and extension: ")
+                file1 = open(filename, "a")
+                for reading in sorted(readings, key=lambda r: r.timestamp):
+                    file1.write(reading.as_csv(unit))
+                    file1.write("\n")
+                file1.close()
+
 
             if not args.with_ketone:
                 readings = (
